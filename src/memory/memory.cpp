@@ -20,6 +20,29 @@ DWORD GetProcessIdByName(const char* processName) {
     return 0;
 }
 
+ptrdiff_t GetModuleBaseAddress(DWORD pid, const char *moduleName) {
+    ptrdiff_t  moduleBase = 0;
+    HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, pid);
+    if (hSnapshot == INVALID_HANDLE_VALUE) {
+        return 0;
+    }
+
+    MODULEENTRY32 me;
+    me.dwSize = sizeof(MODULEENTRY32);
+
+    if (Module32First(hSnapshot, &me)) {
+        do {
+            if (_stricmp(me.szModule, moduleName) == 0) {
+                moduleBase = (ptrdiff_t )me.modBaseAddr;
+                break;
+            }
+        } while (Module32Next(hSnapshot, &me));
+    }
+
+    CloseHandle(hSnapshot);
+    return moduleBase;
+}
+
 bool ReadMemory(HANDLE hProcess, uintptr_t lpBaseAddress, void* lpBuffer, SIZE_T nSize) {
     return ReadProcessMemory(hProcess, (LPCVOID)lpBaseAddress, lpBuffer, nSize, nullptr) != 0;
 }
