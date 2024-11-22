@@ -5,4 +5,7 @@
 #define AMMO_OFFSET 0x00782628
 #define HP_OFFSET 0x168014
 
+// Short Offset
+ädefine AMMO_OFFSET_S 0x140
+
 #endif // OFFSETS_H
